@@ -15,7 +15,7 @@ pub struct BufferPool {
 pub struct BufferPoolManager {
     disk: DiskManager,
     pool: BufferPool,
-    page_table: HashMap<PageIdm, BufferId>,
+    page_table: HashMap<PageId, BufferId>,
 }
 
 fn evict(&mut self) -> Option<BufferId> {
@@ -34,8 +34,8 @@ fn evict(&mut self) -> Option<BufferId> {
             frame.usage_count -= 1;
             consecutive_pinned = 0;
         } else {
-        // バッファが貸出中のとき: consecutive_pinned +1
-            consecutive_pinned +=1;
+            // バッファが貸出中のとき: consecutive_pinned +1
+            consecutive_pinned += 1;
             // consecutive_pinnedがバッファプールのサイズと同じ(=すべてのバッファが貸出中)のとき
             if consecutive_pinned >= pool_size {
                 return None;
@@ -65,7 +65,8 @@ fn fetch_page(&mut self, page_id: PageId) -> Result<Result<Buffer>, Error> {
         // is_dirty: バッファの内容が変更されており,ディスクの内容が古くなっていることを示すフラグ
         // is_dirtyがtrueの場合そのバッファをディスクに書き出す
         if buffer.is_dirty.get() {
-            self.disk.write_page_data(evict_page_id, buffer.page.get_mut());
+            self.disk
+                .write_page_data(evict_page_id, buffer.page.get_mut());
         }
         buffer.page_id = page_id;
         buffer.is_dirty.set(false);
